@@ -1,5 +1,7 @@
 package com.kobakei.ratethisapp;
 
+import static org.robolectric.Shadows.shadowOf;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -12,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-import org.robolectric.res.builder.RobolectricPackageManager;
+import org.robolectric.shadows.ShadowPackageManager;
 import org.robolectric.shadows.ShadowSystemClock;
 
 import java.util.Date;
@@ -37,8 +39,8 @@ public class RateThisAppTest {
         Context context = RuntimeEnvironment.application.getApplicationContext();
 
         // Assume app just installed
-        RobolectricPackageManager roboPackMan = RuntimeEnvironment.getRobolectricPackageManager();
-        PackageInfo pkgInfo = roboPackMan.getPackageInfo(context.getPackageName(), 0);
+        ShadowPackageManager roboPackMan = shadowOf(RuntimeEnvironment.application.getPackageManager());
+        PackageInfo pkgInfo = roboPackMan.getInternalMutablePackageInfo(context.getPackageName());
         pkgInfo.firstInstallTime = System.currentTimeMillis();
     }
 
