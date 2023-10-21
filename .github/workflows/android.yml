@@ -13,20 +13,39 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: set up JDK 11
+
+    - name: set up JDK
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'zulu'
         cache: gradle
 
+    - name: Cache Gradle and wrapper
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
     - name: Build with Gradle
       run: ./gradlew assembleRelease
-    - name: Upload Artifact
+
+    - name: Upload Release Build to Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ratethisapp-release
         path: ratethisapp/build/outputs/aar/ratethisapp-release.aar
         retention-days: 1
+
+    - name: Create Github Release
+      uses: softprops/action-gh-release@v1
+      with:
+        generate_release_notes: true
+        prerelease: false
+        files: |
+          ratethisapp/build/outputs/aar/ratethisapp-release.aar
